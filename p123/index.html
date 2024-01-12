@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>آقا یا خانوم</title>
+    <style>
+        body {
+            display: grid;
+            justify-items: center;
+            align-items: center;
+            background-color: rgba(70, 120, 255, 50);
+            height: 100vh
+        }
+        .box {
+            display: inline;
+            margin: 10px;
+            padding: 20px;
+            background-color: lightgray;
+            border: 1px solid black;
+            border-radius: 20px;
+            box-shadow: 4px 4px 8px rgb(0, 0, 0);
+        }
+
+        .frm1 {
+            display: inline-block;
+            height: 260px;
+            margin-top: 10px;
+
+        }
+
+        .frm2 {
+            display: inline-block;
+            height: 260px;
+            margin-top: 10px;
+
+        }
+
+        .frm1 * {
+            margin: 5px;
+        }
+        .frm2 * {
+            margin: 5px;
+        }
+        .text{
+            height: 37px;
+            width: 26vh;
+            background-color: #e3e3e3;
+        }
+    </style>
+    <script>
+        function getGender() {
+            var name = document.getElementById('name').value;
+            var url = 'https://api.genderize.io/?name=' + name;
+            
+            localData = localStorage.getItem(name);
+            localObj = JSON.parse(localData)
+            try {
+                if(localObj.name == name){
+                    document.getElementById('result').innerText = 'Gender: ' + localObj.gender;
+                    document.getElementById('probability').innerText = 'probability: ' +  '100' + '%';
+                }  
+            } catch (error) {
+                
+                fetch(url).then(function(res){
+                return res.json();
+                }).then(function(data){
+                if(data.gender){
+                    document.getElementById('result').innerText = 'Gender: ' + data.gender;
+                    document.getElementById('probability').innerText = 'probability: ' + data.probability * 100 + '%';
+                }else{
+                    document.getElementById('result').innerText = 'Gender not found.';
+                    document.getElementById('probability').innerText = 'probability: ' + 0.0 + '%';
+    
+                }
+                }).catch(function(err){
+                document.getElementById('error').value = Error;
+                
+                })
+            }
+            
+            
+
+            
+        }
+
+        function saveName(){
+            var name = document.getElementById('name').value;
+            var gender = document.getElementsByName('gender');
+            var selectedGender;
+            
+            if (gender[0].checked) {
+                selectedGender = gender[0].value;
+          
+                var obj = {
+                    name: name,
+                    gender: selectedGender
+                }
+
+                var jsonStr = JSON.stringify(obj);
+                localStorage.setItem(name,jsonStr)
+                document.getElementById('error').value = 'Name Saved'
+            }else{
+                selectedGender = gender[1].value;
+          
+                
+                var obj = {
+                    name: name,
+                    gender: selectedGender
+                }
+
+                var jsonStr = JSON.stringify(obj);
+                localStorage.setItem(name,jsonStr)
+                document.getElementById('error').value = 'Name Saved!'
+            }
+        }
+       
+      </script>
+</head>
+<body>
+    <div class="box">
+        <form action="#" class="frm1" onsubmit="getGender()">
+            <h2>MR or Ms?</h2></br>
+            <input type="text" id="name" maxlength="255" pattern="[A-Za-z\s]+" title="Only English letters are allowed" onchange="textChange(value)"></br>
+
+            <input type="radio" name="gender" id="male" value="male" checked>
+            <label for="male">Male</label></br>
+            <input type="radio" name="gender" id="female" value="female">
+            <label for="female">Female</label></br>
+
+            <input type="submit"></br>
+            <input type="button" name="save" value="Save" onclick="saveName()">
+
+        </form>
+
+        <form action="#" class="frm2">
+            <h2>Prediction?</h2></br>
+            
+            <h4 class="gender" id="result">...</h4>
+            <h5 class="posiblity" id="probability">0.0</h5>
+
+
+            <input type="text" id="error" class="text" disabled></br>
+            
+            <input type="reset" value="clear">
+
+        </form>
+    </div>
+    
+</body>
+</html>
